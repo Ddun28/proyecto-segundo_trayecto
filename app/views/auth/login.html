@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        .toast {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            display: none;
+        }
+        .toast.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-lg rounded-lg p-8 w-96 fade-in">
+        <h2 class="text-2xl font-bold text-center mb-6">Iniciar Sesión</h2>
+        <form id="loginForm">
+            <div class="mb-4">
+                <label for="ci" class="block text-sm font-medium text-gray-700">Cédula</label>
+                <input type="text" id="ci" name="ci" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12345678">
+            </div>
+            <div class="mb-6 relative">
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <div class="relative">
+                    <input type="password" id="password" name="password" required class="mt-1 block w-full border border-gray-300 rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="********">
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 top-1/2 transform -translate-y-1/2">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c0 0 3-9 9-9s9 9 9 9-3 9-9 9-9-9-9-9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out">
+                Iniciar Sesión
+            </button>
+        </form>
+        <p class="mt-4 text-center text-sm text-gray-600">
+            ¿No tienes una cuenta? <a href="register.html" class="text-blue-600 hover:underline">Regístrate</a>
+        </p>
+        <div id="responseMessage" class="mt-4 text-center text-sm text-red-600"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg toast">
+        Inicio de sesión exitoso.
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function () {
+            // Alternar el tipo de input entre 'password' y 'text'
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+                    // Alternar el ícono del ojo
+        eyeIcon.innerHTML = type === 'password' 
+            ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c0 0 3-9 9-9s9 9 9 9-3 9-9 9-9-9-9-9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />'
+            : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c0 0 3-9 9-9s9 9 9 9-3 9-9 9-9-9-9-9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 00-6 0 3 3 0 006 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l-3 3m0-3l3-3" />';
+        });
+
+        // Manejo del envío del formulario
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar el envío normal del formulario
+
+            const formData = new FormData(this);
+
+            // Crear una solicitud HTTP
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'login.php', true);
+
+            // Manejar la respuesta
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.token) {
+                        // Almacenar el token en localStorage
+                        localStorage.setItem('token', response.token);
+                        
+                        // Mostrar el toast de éxito
+                        const toast = document.getElementById('toast');
+                        toast.classList.add('show'); // Mostrar el toast
+                        
+                        // Ocultar el toast después de 3 segundos
+                        setTimeout(() => {
+                            toast.classList.remove('show'); 
+                        }, 2000); 
+
+                        // Redirigir a la página del panel administrativo
+                        setTimeout(() => {
+                            window.location.href = '../admin/index.html';
+                        }, 3000); // Esperar 3 segundos antes de redirigir
+                    } else {
+                        document.getElementById('responseMessage').innerText = response.error;
+                    }
+                } else {
+                    document.getElementById('responseMessage').innerText = 'Error: ' + xhr.statusText;
+                }
+            };
+
+            // Enviar la solicitud
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>
