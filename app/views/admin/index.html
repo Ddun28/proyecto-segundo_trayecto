@@ -1,124 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <style>
-        /* Estilo para el menú lateral */
-        .sidebar {
-            transition: width 0.3s;
-        }
-        .sidebar.collapsed {
-            width: 80px;
-        }
-        .sidebar.expanded {
-            width: 250px;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Boxicons -->
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<!-- My CSS -->
+	<link rel="stylesheet" href="style.css">
+
+	<title>AdminHub</title>
 </head>
-<body class="bg-gray-100 flex">
+<body>
 
-    <!-- Menú Lateral -->
-    <div class="sidebar bg-white shadow-lg h-screen p-4 flex flex-col expanded" id="sidebar">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-xl font-bold">Admin Panel</h1>
-            <button id="toggleSidebar" class="text-gray-600 focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-            </button>
+
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="#" class="brand">
+			<i class='bx bxs-smile'></i>
+			<span class="text">AdminHub</span>
+		</a>
+		<ul class="side-menu top">
+			<li class="active">
+				<a href="#">
+					<i class='bx bxs-dashboard' ></i>
+					<span class="text">Dashboard</span>
+				</a>
+			</li>
+		</ul>
+		<ul class="side-menu">
+			<li>
+				<a href="#" class="logout" onclick="logout()">
+					<i class='bx bxs-log-out-circle'></i>
+					<span class="text">Logout</span>
+				</a>
+			</li>
+		</ul>
+	</section>
+	<!-- SIDEBAR -->
+
+
+
+	<!-- CONTENT -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu' ></i>
+			<a href="#" class="nav-link">Categories</a>
+			<form action="#">
+				<div class="form-input">
+					<input type="search" placeholder="Search...">
+					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+				</div>
+			</form>
+			<input type="checkbox" id="switch-mode" hidden>
+			<label for="switch-mode" class="switch-mode"></label>
+			
+		</nav>
+		<!-- NAVBAR -->
+
+		<!-- MAIN -->
+		<main>
+			<div class="head-title">
+				<div class="left">
+					<h1>Dashboard</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Dashboard</a>
+						</li>
+						<li><i class='bx bx-chevron-right' ></i></li>
+						<li>
+							<a class="active" href="#">Home</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<ul class="box-info">
+				<li>
+					<i class='bx bxs-calendar-check'></i>
+					<span class="text">
+						<h3 id="newOrderDate"></h3> 
+						<p>Fecha</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-group'></i>
+					<span class="text">
+						<h3 id="userCount"></h3>
+						<p>Usuarios</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-dollar-circle' ></i>
+					<span class="text">
+						<h3>$2543</h3>
+						<p>Total Sales</p>
+					</span>
+				</li>
+			</ul>
+
+
+			<div class="table-data">
+				 <div class="order">
+        <div class="head">
+            <h3>Tabla de usuarios</h3>
+            <input type="text" class="style-search" id="searchInput" placeholder="Buscar por nombre, apellido o c.i.">
+            <i class='bx bx-search' id="searchIcon"></i>
+            <i class='bx bx-filter'></i>
         </div>
-        <nav>
-            <ul>
-                <li class="mb-4">
-                    <a href="#" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />
-                        </svg>
-                        <span class="menu-text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="#" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
-                        </svg>
-                        <span class="menu-text">Usuarios</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="#" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3z" />
-                        </svg>
-                        <span class="menu-text">Configuración</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="#" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
-                        </svg>
-                        <span class="menu-text">Reportes</span>
-                    </a>
-                </li>
-                <li class="mb-4">
-                    <a href="#" class="flex items-center p-2 text-gray-700 hover:bg-gray-200 rounded-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A9.965 9.965 0 0020 12a9.965 9.965 0 00-1.405-3.595L19 7h-5m-6 0H4l1.405 1.405A9.965 9.965 0 004 12a9.965 9.965 0 001.405 3.595L4 17h5" />
-                        </svg>
-                        <span class="menu-text">Logout</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>C.I.</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                <!-- Las filas se llenarán dinámicamente con JavaScript -->
+            </tbody>
+        </table>
     </div>
+				<div class="todo">
+					<div class="head">
+						<h3>Todos</h3>
+						<i class='bx bx-plus' ></i>
+						<i class='bx bx-filter' ></i>
+					</div>
+					<ul class="todo-list">
+						<li class="completed">
+							<p>Todo List</p>
+							<i class='bx bx-dots-vertical-rounded' ></i>
+						</li>
+						<li class="completed">
+							<p>Todo List</p>
+							<i class='bx bx-dots-vertical-rounded' ></i>
+						</li>
+						<li class="not-completed">
+							<p>Todo List</p>
+							<i class='bx bx-dots-vertical-rounded' ></i>
+						</li>
+						<li class="completed">
+							<p>Todo List</p>
+							<i class='bx bx-dots-vertical-rounded' ></i>
+						</li>
+						<li class="not-completed">
+							<p>Todo List</p>
+							<i class='bx bx-dots-vertical-rounded' ></i>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</main>
+		<!-- MAIN -->
+	</section>
+	<!-- CONTENT -->
+	
 
-    <!-- Contenido Principal -->
-    <div class="flex-1 p-6">
-        <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Tarjeta 1 -->
-            <div class="bg-white shadow-md rounded-lg p-4">
-                <h3 class="text-lg font-semibold">Total de Usuarios</h3>
-                <p class="text-2xl font-bold text-blue-600">150</p>
-            </div>
-            <!-- Tarjeta 2 -->
-            <div class="bg-white shadow-md rounded-lg p-4">
-                <h3 class="text-lg font-semibold">Total de Ventas</h3>
-                <p class="text-2xl font-bold text-green-600">$3,200</p>
-            </div>
-            <!-- Tarjeta 3 -->
-            <div class="bg-white shadow-md rounded-lg p-4">
-                <h3 class="text-lg font-semibold">Total de Productos</h3>
-                <p class="text-2xl font-bold text-yellow-600">75</p>
-            </div>
-            <!-- Tarjeta 4 -->
-            <div class="bg-white shadow-md rounded-lg p-4">
-                <h3 class="text-lg font-semibold">Total de Reportes</h3>
-                <p class="text-2xl font-bold text-red-600">5</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Lógica para alternar el menú lateral
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const sidebar = document.getElementById('sidebar');
-        const menuTexts = document.querySelectorAll('.menu-text');
-
-        toggleSidebar.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            sidebar.classList.toggle('expanded');
-
-            // Alternar la visibilidad del texto del menú
-            menuTexts.forEach(text => {
-                text.classList.toggle('hidden');
-            });
-        });
-    </script>
+	<script src="script.js"></script>
 </body>
 </html>
