@@ -6,10 +6,11 @@
 
 	<!-- Boxicons -->
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<!-- My CSS -->
 	<link rel="stylesheet" href="style.css">
 
-	<title>AdminHub</title>
+	<title>SAIDER</title>
 </head>
 <body>
 
@@ -18,13 +19,19 @@
 	<section id="sidebar">
 		<a href="#" class="brand">
 			<i class='bx bxs-smile'></i>
-			<span class="text">AdminHub</span>
+			<span class="text">SAIDER</span>
 		</a>
 		<ul class="side-menu top">
 			<li class="active">
 				<a href="#">
 					<i class='bx bxs-dashboard' ></i>
 					<span class="text">Dashboard</span>
+				</a>
+			</li>
+			<li class="">
+				<a href="register-user.html">
+					<i class='bx bxs-user-rectangle' ></i>
+					<span class="text">Registrar Empleado</span>
 				</a>
 			</li>
 		</ul>
@@ -46,7 +53,7 @@
 		<!-- NAVBAR -->
 		<nav>
 			<i class='bx bx-menu' ></i>
-			<a href="#" class="nav-link">Categories</a>
+			<a href="#" class="nav-link"></a>
 			<form action="#">
 				<div class="form-input">
 					<input type="search" placeholder="Search...">
@@ -55,6 +62,8 @@
 			</form>
 			<input type="checkbox" id="switch-mode" hidden>
 			<label for="switch-mode" class="switch-mode"></label>
+
+			<span id="fullName" class="fullName"></span>
 			
 		</nav>
 		<!-- NAVBAR -->
@@ -92,10 +101,10 @@
 					</span>
 				</li>
 				<li>
-					<i class='bx bxs-dollar-circle' ></i>
+					<i class='bx bxs-calendar-check'></i> <!-- Icono de asistencia -->
 					<span class="text">
-						<h3>$2543</h3>
-						<p>Total Sales</p>
+						<h3 id="totalAsistencias">0</h3> <!-- Contenedor para el total de asistencias -->
+						<p>Asistencias</p>
 					</span>
 				</li>
 			</ul>
@@ -104,7 +113,7 @@
 			<div class="table-data">
 				 <div class="order">
         <div class="head">
-            <h3>Tabla de usuarios</h3>
+            <h3>Tabla de Empleados</h3>
             <input type="text" class="style-search" id="searchInput" placeholder="Buscar por nombre, apellido o c.i.">
             <i class='bx bx-search' id="searchIcon"></i>
             <i class='bx bx-filter'></i>
@@ -125,31 +134,14 @@
     </div>
 				<div class="todo">
 					<div class="head">
-						<h3>Todos</h3>
-						<i class='bx bx-plus' ></i>
-						<i class='bx bx-filter' ></i>
+						<h3>Asistencia</h3>
+						<a href="../assitances/formupro.html">
+							<i class='bx bx-plus'></i>
+						</a>
+						<i class='bx bx-filter' onclick="openFilterModal()"></i>
 					</div>
-					<ul class="todo-list">
-						<li class="completed">
-							<p>Todo List</p>
-							<i class='bx bx-dots-vertical-rounded' ></i>
-						</li>
-						<li class="completed">
-							<p>Todo List</p>
-							<i class='bx bx-dots-vertical-rounded' ></i>
-						</li>
-						<li class="not-completed">
-							<p>Todo List</p>
-							<i class='bx bx-dots-vertical-rounded' ></i>
-						</li>
-						<li class="completed">
-							<p>Todo List</p>
-							<i class='bx bx-dots-vertical-rounded' ></i>
-						</li>
-						<li class="not-completed">
-							<p>Todo List</p>
-							<i class='bx bx-dots-vertical-rounded' ></i>
-						</li>
+					<ul class="todo-list" id="asistenciaList">
+						<!-- Las asistencias se llenarán dinámicamente con JavaScript -->
 					</ul>
 				</div>
 			</div>
@@ -157,7 +149,42 @@
 		<!-- MAIN -->
 	</section>
 	<!-- CONTENT -->
+
+	<div id="editUserModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h2>Editar Usuario</h2>
+			<form id="editUserForm">
+				<label for="editName">Nombre:</label>
+				<input type="text" id="editName" name="editName" required>
 	
+				<label for="editLastname">Apellido:</label>
+				<input type="text" id="editLastname" name="editLastname" required>
+	
+				<label for="editCi">Cédula:</label>
+				<input type="text" id="editCi" name="editCi" required>
+	
+				<label for="editRol">Rol:</label>
+				<select id="editRol" name="editRol" required>
+					<option value="admin">Administrador</option>
+					<option value="personal">Personal</option>
+				</select>
+	
+				<button type="submit">Guardar Cambios</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modal de Filtro -->
+<div id="filterModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeFilterModal()">&times;</span>
+        <h4>Filtrar Asistencias</h4>
+        <button onclick="filterAsistencias('day')">Por Día</button>
+        <button onclick="filterAsistencias('week')">Por Semana</button>
+        <button onclick="filterAsistencias('month')">Por Mes</button>
+    </div>
+</div>
 
 	<script src="script.js"></script>
 </body>

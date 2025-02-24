@@ -14,6 +14,236 @@ li {
 	list-style: none;
 }
 
+/* Estilos base para el modal */
+.modal {
+	font-family: var(--lato);
+    display: none; /* Oculto por defecto */
+    position: fixed; /* Posición fija */
+    z-index: 1000; /* Encima de todo */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho completo */
+    height: 100%; /* Alto completo */
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo oscuro semitransparente */
+    backdrop-filter: blur(5px); /* Efecto de desenfoque */
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Cuando el modal está abierto */
+.modal.open {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Contenido del modal */
+.modal-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    padding: 2rem;
+    position: relative;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+/* Cuando el modal está abierto */
+.modal.open .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Botón para cerrar el modal */
+.close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #333;
+}
+
+/* Título del modal */
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 1.75rem;
+    color: #333;
+    text-align: center;
+}
+
+/* Formulario dentro del modal */
+#editUserForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Estilos para las etiquetas */
+#editUserForm label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+/* Estilos para los inputs */
+#editUserForm input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#editUserForm input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+/* Estilos para el botón de guardar */
+#editUserForm button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#editUserForm button:hover {
+    background-color: #0056b3;
+}
+
+/* Efecto de hover en el botón */
+#editUserForm button:active {
+    transform: scale(0.98);
+}
+
+/* Estilos para el campo select */
+#editUserForm select {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    appearance: none; /* Elimina el estilo por defecto del navegador */
+    -webkit-appearance: none; /* Para Safari */
+    -moz-appearance: none; /* Para Firefox */
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>'); /* Flecha personalizada */
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#editUserForm select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+
+.fullName {
+    margin-left: 20px;
+    font-weight: bold;
+	font-size: larger;
+    color: #2f9ed1; /* Color verde */
+}
+
+.style-search {
+	padding: 5px 10px;
+	padding-left: 20px;
+	border: 2px solid #ccc;
+	border-radius: 25px;
+	font-size: 16px;
+	outline: none;
+	transition: all 0.3s ease;
+	width: 250px;
+}
+
+.style-search:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+}
+
+/* Estilos para el contenedor del formulario */
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los grupos de formulario */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+/* Estilos para el botón de enviar */
+.submit-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
 :root {
 	--poppins: 'Poppins', sans-serif;
 	--lato: 'Lato', sans-serif;

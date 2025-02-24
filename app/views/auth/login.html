@@ -53,9 +53,6 @@
                 Iniciar Sesión
             </button>
         </form>
-        <p class="mt-4 text-center text-sm text-gray-600">
-            ¿No tienes una cuenta? <a href="register.html" class="text-blue-600 hover:underline">Regístrate</a>
-        </p>
         <div id="responseMessage" class="mt-4 text-center text-sm text-red-600"></div>
     </div>
 
@@ -80,48 +77,49 @@
             : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12c0 0 3-9 9-9s9 9 9 9-3 9-9 9-9-9-9-9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 00-6 0 3 3 0 006 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l-3 3m0-3l3-3" />';
         });
 
-        // Manejo del envío del formulario
         document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evitar el envío normal del formulario
+    event.preventDefault(); // Evitar el envío normal del formulario
 
-            const formData = new FormData(this);
+    const formData = new FormData(this);
 
-            // Crear una solicitud HTTP
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'login.php', true);
+    // Crear una solicitud HTTP
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'login.php', true);
 
-            // Manejar la respuesta
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.token) {
-                        // Almacenar el token en localStorage
-                        localStorage.setItem('token', response.token);
-                        
-                        // Mostrar el toast de éxito
-                        const toast = document.getElementById('toast');
-                        toast.classList.add('show'); // Mostrar el toast
-                        
-                        // Ocultar el toast después de 3 segundos
-                        setTimeout(() => {
-                            toast.classList.remove('show'); 
-                        }, 2000); 
+    // Manejar la respuesta
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.token) {
+                // Almacenar el token y el nombre completo del usuario en localStorage
+                localStorage.setItem('token', response.token);
+                localStorage.setItem('fullName', response.fullName);
+                localStorage.setItem('rol', response.rol); 
+                
+                // Mostrar el toast de éxito
+                const toast = document.getElementById('toast');
+                toast.classList.add('show'); // Mostrar el toast
+                
+                // Ocultar el toast después de 3 segundos
+                setTimeout(() => {
+                    toast.classList.remove('show'); 
+                }, 2000); 
 
-                        // Redirigir a la página del panel administrativo
-                        setTimeout(() => {
-                            window.location.href = '../admin/index.html';
-                        }, 3000); // Esperar 3 segundos antes de redirigir
-                    } else {
-                        document.getElementById('responseMessage').innerText = response.error;
-                    }
-                } else {
-                    document.getElementById('responseMessage').innerText = 'Error: ' + xhr.statusText;
-                }
-            };
+                // Redirigir a la página del panel administrativo
+                setTimeout(() => {
+                    window.location.href = '../admin/index.html';
+                }, 3000); // Esperar 3 segundos antes de redirigir
+            } else {
+                document.getElementById('responseMessage').innerText = response.error;
+            }
+        } else {
+            document.getElementById('responseMessage').innerText = 'Error: ' + xhr.statusText;
+        }
+    };
 
-            // Enviar la solicitud
-            xhr.send(formData);
-        });
+    // Enviar la solicitud
+    xhr.send(formData);
+});
     </script>
 </body>
 </html>

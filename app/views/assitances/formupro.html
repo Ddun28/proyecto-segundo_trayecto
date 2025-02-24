@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Llegada y Salida</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- SweetAlert2 CSS y JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #B0C4DE;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .form-container {
+            max-width: 300px;
+            width: 100%;
+            padding: 25px;
+            border: 1px solid #FAFAD2;
+            border-radius: 10px;
+            background-color: #F8F8FF;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .form-container:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #2d3748;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+
+        .form-container input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #808080;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button.llegada:hover {
+            background-color: #4CAF50;
+        }
+
+        .form-container button.salida:hover {
+            background-color: #f44336;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 15px;
+            color: #4a5568;
+        }
+
+        p a {
+            color: #718096;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        p a:hover {
+            color: #2b6cb0;
+        }
+
+        .icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Registro de Llegada y Salida</h2>
+        <form id="registroForm">
+            <label for="cedula">Número de Cédula:</label>
+            <input type="text" id="cedula" name="cedula" placeholder="Ingrese su cédula" required>
+            
+            <button type="button" class="llegada" onclick="registrarLlegada()">Llegada</button>
+            <button type="button" class="salida" onclick="registrarSalida()">Salida</button>
+        </form>
+        <p>
+            <i class="fas fa-sign-in-alt icon"></i>
+            <a href="../auth/login.html">Iniciar sesión como administrador</a>
+        </p>
+    </div>
+
+    <script>
+        function registrarLlegada() {
+            const cedula = document.getElementById('cedula').value;
+            if (!cedula) {
+                showModal('Por favor, ingrese un número de cédula.', 'error');
+                return;
+            }
+
+            fetch('../../controllers/AsistenciaController.php?action=registrarLlegada', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cedula: cedula }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showModal('Llegada registrada con éxito.', 'success');
+                } else {
+                    showModal('Error al registrar la llegada: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showModal('Error de conexión: ' + error.message, 'error');
+            });
+        }
+
+        function registrarSalida() {
+            const cedula = document.getElementById('cedula').value;
+            if (!cedula) {
+                showModal('Por favor, ingrese un número de cédula.', 'error');
+                return;
+            }
+
+            fetch('../../controllers/AsistenciaController.php?action=registrarSalida', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cedula: cedula }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showModal('Salida registrada con éxito.', 'success');
+                } else {
+                    showModal('Error al registrar la salida: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showModal('Error de conexión: ' + error.message, 'error');
+            });
+        }
+
+        function showModal(message, type) {
+            const icon = type === 'success' ? 'success' : 'error';
+            const title = type === 'success' ? 'Éxito' : 'Error';
+            const color = type === 'success' ? '#4CAF50' : '#f44336';
+
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: icon,
+                confirmButtonColor: color,
+                timer: 3000, 
+                timerProgressBar: true,
+            });
+        }
+    </script>
+
+</body>
+</html>

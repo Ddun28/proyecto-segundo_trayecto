@@ -45,17 +45,52 @@ class UserController {
     // Método para manejar las solicitudes
     public function handleRequest() {
         header('Content-Type: application/json'); // Establecer el tipo de respuesta como JSON
-
+    
         $action = $_GET['action'] ?? '';
-
+    
         try {
             switch ($action) {
+
+                case 'createUser':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    if (empty($data['name']) || empty($data['lastname']) || empty($data['ci']) || empty($data['rol']) || empty($data['password'])) {
+                        throw new Exception('Todos los campos son obligatorios');
+                    }
+                    $userId = $this->createUser($data['name'], $data['lastname'], $data['ci'], $data['rol'], $data['password']);
+                    echo json_encode(['success' => true, 'userId' => $userId]);
+                    break;
+    
+
                 case 'getAllUsers':
                     $query = $_GET['query'] ?? '';
                     $users = $this->getAllUsers($query);
                     echo json_encode($users);
                     break;
-
+    
+                case 'getUserById':
+                    $id = $_GET['id'] ?? '';
+                    if (empty($id)) {
+                        throw new Exception('ID de usuario no proporcionado');
+                    }
+                    $user = $this->getUserById($id);
+                    if (!$user) {
+                        throw new Exception('Usuario no encontrado');
+                    }
+                    echo json_encode($user);
+                    break;
+    
+                case 'updateUser':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    if (empty($data['id'])) {
+                        throw new Exception('ID de usuario no proporcionado');
+                    }
+                    if (empty($data['rol'])) {
+                        throw new Exception('Rol de usuario no proporcionado');
+                    }
+                    $success = $this->updateUser($data['id'], $data['name'], $data['lastname'], $data['ci'], $data['rol']);
+                    echo json_encode(['success' => $success]);
+                    break;
+    
                 case 'deleteUser':
                     $id = $_GET['id'] ?? '';
                     if (empty($id)) {
@@ -64,7 +99,7 @@ class UserController {
                     $success = $this->deleteUser($id);
                     echo json_encode(['success' => $success]);
                     break;
-
+    
                 default:
                     throw new Exception('Acción no válida');
             }
