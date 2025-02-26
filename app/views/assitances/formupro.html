@@ -112,11 +112,31 @@
         </form>
         <p>
             <i class="fas fa-sign-in-alt icon"></i>
-            <a href="../auth/login.html">Iniciar sesión como administrador</a>
+            <a id="loginLink" href="../auth/login.html">Iniciar sesión como administrador</a>
         </p>
     </div>
 
     <script>
+
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Obtener el token de la URL
+        const token = getQueryParam('token');
+
+        document.getElementById('loginLink').addEventListener('click', function(event) {
+            event.preventDefault(); 
+            if (token) {
+               
+                window.location.href = '../admin/index.html';
+            } else {
+                
+                window.location.href = '../auth/login.html';
+            }
+        });
+
         function registrarLlegada() {
             const cedula = document.getElementById('cedula').value;
             if (!cedula) {

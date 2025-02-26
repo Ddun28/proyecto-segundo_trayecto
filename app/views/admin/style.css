@@ -33,6 +33,35 @@ li {
     visibility: hidden;
 }
 
+.btn-generate-pdf {
+    background-color: #4CAF50; /* Color de fondo verde */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    padding: 12px 24px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de la fuente */
+    font-family: 'Arial', sans-serif; /* Fuente */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+    display: inline-flex; /* Para alinear ícono y texto */
+    align-items: center; /* Centrar verticalmente */
+    gap: 8px; /* Espacio entre ícono y texto */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
+}
+
+.btn-generate-pdf:hover {
+    background-color: #45a049; /* Color de fondo al pasar el mouse */
+    transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+}
+
+.btn-generate-pdf:active {
+    background-color: #3d8b40; /* Color de fondo al hacer clic */
+    transform: scale(0.95); /* Efecto de escala al hacer clic */
+}
+
+.btn-generate-pdf i {
+    font-size: 20px; /* Tamaño del ícono */
+}
+
 /* Cuando el modal está abierto */
 .modal.open {
     display: flex;

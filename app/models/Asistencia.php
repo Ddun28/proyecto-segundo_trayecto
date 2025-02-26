@@ -22,10 +22,13 @@ class Asistencia {
 
     public function getAsistenciasHoy() {
         $hoy = date('Y-m-d'); // Obtener la fecha actual en formato YYYY-MM-DD
-        $sql = "SELECT COUNT(*) as total FROM asistencia WHERE DATE(hora_llegada) = :hoy";
+        $sql = "SELECT a.*, e.name, e.lastname 
+                FROM asistencia a 
+                JOIN user e ON a.cedula = e.ci 
+                WHERE DATE(a.hora_llegada) = :hoy";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['hoy' => $hoy]);
-        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve todas las asistencias del día junto con los datos del usuario
     }
 
     // Método para obtener todas las asistencias
@@ -66,4 +69,37 @@ class Asistencia {
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute(['id' => $id]);
     }
+
+    public function getAsistenciasSemana() {
+        $inicioSemana = date('Y-m-d', strtotime('monday this week')); // Inicio de la semana
+        $finSemana = date('Y-m-d', strtotime('sunday this week')); // Fin de la semana
+    
+        $sql = "SELECT a.*, e.name, e.lastname 
+                FROM asistencia a 
+                JOIN user e ON a.cedula = e.ci 
+                WHERE DATE(a.hora_llegada) BETWEEN :inicioSemana AND :finSemana";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'inicioSemana' => $inicioSemana,
+            'finSemana' => $finSemana
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve todas las asistencias de la semana junto con los datos del usuario
+    }
+    
+    public function getAsistenciasMes() {
+        $inicioMes = date('Y-m-01'); // Primer día del mes
+        $finMes = date('Y-m-t'); // Último día del mes
+    
+        $sql = "SELECT a.*, e.name, e.lastname 
+                FROM asistencia a 
+                JOIN user e ON a.cedula = e.ci 
+                WHERE DATE(a.hora_llegada) BETWEEN :inicioMes AND :finMes";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'inicioMes' => $inicioMes,
+            'finMes' => $finMes
+        ]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve todas las asistencias del mes junto con los datos del usuario
+    }
+
 }

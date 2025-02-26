@@ -58,35 +58,45 @@ class AsistenciaController {
                     echo json_encode(['success' => true, 'asistenciaId' => $asistenciaId]);
                     break;
     
-                    case 'registrarSalida':
-                        $data = json_decode(file_get_contents('php://input'), true);
-                        if (empty($data['cedula'])) {
-                            throw new Exception('Cédula no proporcionada');
-                        }
-                        error_log("Registrando salida para cédula: " . $data['cedula']); // Depuración
-                        $success = $this->registrarSalida($data['cedula']);
-                        error_log("Resultado de registrar salida: " . ($success ? 'Éxito' : 'Fallo')); // Depuración
-                        echo json_encode(['success' => $success]);
-                        break;
-
-                    case 'getAsistencias':
-                            $asistencias = $this->asistenciaModel->getAsistencias();
-                            echo json_encode(['success' => true, 'asistencias' => $asistencias]);
-                        break;
-
-                    case 'getAsistenciasHoy':
-                            $totalAsistencias = $this->asistenciaModel->getAsistenciasHoy();
-                            echo json_encode(['success' => true, 'totalAsistencias' => $totalAsistencias]);
-                        break;
-
-                    case 'deleteAsistencia':
-                                $data = json_decode(file_get_contents('php://input'), true);
-                                if (empty($data['id'])) {
-                                    throw new Exception('ID de asistencia no proporcionado');
-                                }
-                                $success = $this->deleteAsistencia($data['id']);
-                                echo json_encode(['success' => $success]);
-                         break;
+                case 'registrarSalida':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    if (empty($data['cedula'])) {
+                        throw new Exception('Cédula no proporcionada');
+                    }
+                    error_log("Registrando salida para cédula: " . $data['cedula']); // Depuración
+                    $success = $this->registrarSalida($data['cedula']);
+                    error_log("Resultado de registrar salida: " . ($success ? 'Éxito' : 'Fallo')); // Depuración
+                    echo json_encode(['success' => $success]);
+                    break;
+    
+                case 'getAsistencias':
+                    $asistencias = $this->asistenciaModel->getAsistencias();
+                    echo json_encode(['success' => true, 'asistencias' => $asistencias]);
+                    break;
+    
+                case 'getAsistenciasHoy':
+                    $totalAsistencias = $this->asistenciaModel->getAsistenciasHoy();
+                    echo json_encode(['success' => true, 'totalAsistencias' => $totalAsistencias]);
+                    break;
+    
+                case 'getAsistenciasSemana':
+                    $asistenciasSemana = $this->asistenciaModel->getAsistenciasSemana();
+                    echo json_encode(['success' => true, 'asistenciasSemana' => $asistenciasSemana]);
+                    break;
+    
+                case 'getAsistenciasMes':
+                    $asistenciasMes = $this->asistenciaModel->getAsistenciasMes();
+                    echo json_encode(['success' => true, 'asistenciasMes' => $asistenciasMes]);
+                    break;
+    
+                case 'deleteAsistencia':
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    if (empty($data['id'])) {
+                        throw new Exception('ID de asistencia no proporcionado');
+                    }
+                    $success = $this->deleteAsistencia($data['id']);
+                    echo json_encode(['success' => $success]);
+                    break;
     
                 default:
                     throw new Exception('Acción no válida');

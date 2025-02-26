@@ -10,6 +10,9 @@
 	<!-- My CSS -->
 	<link rel="stylesheet" href="style.css">
 
+	<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
+
 	<title>SAIDER</title>
 </head>
 <body>
@@ -135,10 +138,13 @@
 				<div class="todo">
 					<div class="head">
 						<h3>Asistencia</h3>
-						<a href="../assitances/formupro.html">
+						<a href="../assitances/formupro.html?token=" id="asistenciaLink">
 							<i class='bx bx-plus'></i>
 						</a>
 						<i class='bx bx-filter' onclick="openFilterModal()"></i>
+						<button id="generatePdf" class="editBtn" aria-label="Generar PDF">
+							<i class='bx bx-file'></i> Generar PDF
+						</button>
 					</div>
 					<ul class="todo-list" id="asistenciaList">
 						<!-- Las asistencias se llenarán dinámicamente con JavaScript -->

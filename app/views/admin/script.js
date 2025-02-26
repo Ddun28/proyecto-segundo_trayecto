@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const token = localStorage.getItem('token');
-    const rol = localStorage.getItem('rol'); // Asegúrate de almacenar el rol en el localStorage
+    const rol = localStorage.getItem('rol'); 
+
+    if (token) {
+        const asistenciaLink = document.getElementById('asistenciaLink');
+        asistenciaLink.href += encodeURIComponent(token, rol); 
+    }
 
     if (!token || rol !== 'admin') {
         // Redirigir al usuario si no tiene token o no es admin
@@ -31,32 +36,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
     const searchIcon = document.getElementById('searchIcon');
 
-    function updateTotalAsistencias() {
+
+    function fetchAndUpdateAsistencias() {
         fetch('../../controllers/AsistenciaController.php?action=getAsistenciasHoy')
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Actualizar el contador de asistencias
                     const totalAsistenciasElement = document.getElementById('totalAsistencias');
-                    totalAsistenciasElement.textContent = data.totalAsistencias; // Actualizar el total
-                } else {
-                    console.error('Error al obtener el total de asistencias:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error de conexión:', error);
-            });
-    }
-    updateTotalAsistencias();
-
-    function fetchAsistencias() {
-        fetch('../../controllers/AsistenciaController.php?action=getAsistencias')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+                    totalAsistenciasElement.textContent = data.totalAsistencias.length;
+    
+                    // Actualizar la lista de asistencias
                     const asistenciaList = document.getElementById('asistenciaList');
                     asistenciaList.innerHTML = ''; // Limpiar la lista antes de agregar nuevos elementos
     
-                    data.asistencias.forEach(asistencia => {
+                    data.totalAsistencias.forEach(asistencia => {
                         const li = document.createElement('li');
                         li.className = asistencia.hora_salida ? 'completed' : 'not-completed';
     
@@ -69,8 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
     
                         // Crear el botón de eliminar
                         const eliminarButton = document.createElement('button');
-                        eliminarButton.className = 'deleteBtn';
                         eliminarButton.textContent = 'Eliminar';
+                        eliminarButton.className = 'deleteBtn';
                         eliminarButton.addEventListener('click', function () {
                             Swal.fire({
                                 title: '¿Estás seguro de que deseas eliminar esta asistencia?',
@@ -102,6 +96,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
     
+    // Llamar a la función para cargar y actualizar las asistencias
+    fetchAndUpdateAsistencias();
+
     // Función para eliminar una asistencia
     function eliminarAsistencia(id) {
         fetch(`../../controllers/AsistenciaController.php?action=deleteAsistencia&id=${id}`, {
@@ -121,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     showConfirmButton: false,
                     timer: 1500
                 });
-                fetchAsistencias(); // Recargar la lista de asistencias
+                fetchAndUpdateAsistencias(); // Recargar la lista de asistencias
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -410,7 +407,7 @@ function saveUserChanges(userId) {
         }
     });
 
-    fetchAsistencias();
+    fetchAndUpdateAsistencias();
     loadUsers();
 });
 
@@ -427,46 +424,31 @@ allSideMenu.forEach(item => {
         li.classList.add('active');
     });
 });
-function openFilterModal() {
-    // Variable para almacenar el período seleccionado
-    let selectedPeriod = null;
 
+function openFilterModal() {
     Swal.fire({
         title: 'Filtrar Asistencias',
         text: 'Selecciona un período:',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Aplicar',
         html: `
             <div>
-                <button id="filterDay" class="swal2-confirm swal2-styled">Por Día</button>
                 <button id="filterWeek" class="swal2-confirm swal2-styled">Por Semana</button>
                 <button id="filterMonth" class="swal2-confirm swal2-styled">Por Mes</button>
             </div>
         `,
         focusConfirm: false,
-        preConfirm: () => {
-            return new Promise((resolve) => {
-                // Asignar el evento de clic a cada botón
-                document.getElementById('filterDay').onclick = () => {
-                    selectedPeriod = 'day';
-                    resolve(selectedPeriod); // Resolver la promesa con el período seleccionado
-                };
-                document.getElementById('filterWeek').onclick = () => {
-                    selectedPeriod = 'week';
-                    resolve(selectedPeriod); // Resolver la promesa con el período seleccionado
-                };
-                document.getElementById('filterMonth').onclick = () => {
-                    selectedPeriod = 'month';
-                    resolve(selectedPeriod); // Resolver la promesa con el período seleccionado
-                };
-            });
-        }
-    }).then((result) => {
-        // Solo ejecutar el filtro si se ha seleccionado un período
-        if (result.value) {
-            filterAsistencias(result.value); // Llamar a la función de filtrado con el período seleccionado
+        didOpen: () => {
+
+            document.getElementById('filterWeek').onclick = () => {
+                Swal.close(); // Cerrar el modal
+                filterAsistencias('week'); // Aplicar el filtro de semana
+            };
+            document.getElementById('filterMonth').onclick = () => {
+                Swal.close(); // Cerrar el modal
+                filterAsistencias('month'); // Aplicar el filtro de mes
+            };
         }
     });
 }
@@ -603,4 +585,54 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+});
+
+document.getElementById('generatePdf').addEventListener('click', function() {
+    const jsPDF = window.jspdf.jsPDF;
+    const doc = new jsPDF();
+
+    // Título del PDF
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Reporte de Asistencias', 10, 10);
+
+    // Subtítulo con la fecha
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'normal');
+    const today = new Date();
+    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+    doc.text(`Fecha: ${formattedDate}`, 10, 20);
+
+    // Obtener la lista de asistencias
+    const asistenciaList = document.getElementById('asistenciaList');
+    const asistencias = asistenciaList.getElementsByTagName('li');
+
+    // Preparar los datos para la tabla
+    const data = [];
+    for (let i = 0; i < asistencias.length; i++) {
+        const asistencia = asistencias[i].querySelector('p').innerText;
+        const [nombre, llegada, salida] = asistencia.split('\n'); // Dividir el texto en partes
+        data.push([nombre.trim(), llegada.trim(), salida.trim()]);
+    }
+
+    // Crear la tabla
+    doc.autoTable({
+        startY: 30, // Posición vertical inicial
+        head: [['Nombre', 'Hora de Llegada', 'Hora de Salida']], // Encabezados de la tabla
+        body: data, // Datos de la tabla
+        theme: 'striped', // Estilo de la tabla
+        styles: {
+            fontSize: 10, // Tamaño de la fuente
+            cellPadding: 3, // Espaciado interno de las celdas
+        },
+        headStyles: {
+            fillColor: [40, 40, 40], // Color de fondo del encabezado
+            textColor: [255, 255, 255], // Color del texto del encabezado
+        },
+    });
+
+    // Guardar el PDF
+    doc.save('reporte_asistencias.pdf');
 });
