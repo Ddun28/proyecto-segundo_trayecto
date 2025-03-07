@@ -90,6 +90,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 })
 
+// TOGGLE SIDEBAR
+const menuBar = document.querySelector('#content nav .bx.bx-menu');
+const sidebar = document.getElementById('sidebar');
+
+menuBar.addEventListener('click', function () {
+    sidebar.classList.toggle('hide');
+});
+
 
 // Ajustes para pantallas pequeñas
 if (window.innerWidth < 768) {

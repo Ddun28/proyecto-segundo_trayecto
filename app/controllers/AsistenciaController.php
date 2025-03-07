@@ -1,5 +1,4 @@
 <?php
-// controllers/AsistenciaController.php
 
 require_once __DIR__ . '/../models/Asistencia.php';
 
@@ -108,7 +107,6 @@ class AsistenciaController {
     }
 }
 
-// Ejecutar el controlador
 try {
     require_once '../../config/database.php';
     global $pdo;

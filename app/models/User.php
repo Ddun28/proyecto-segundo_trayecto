@@ -9,18 +9,19 @@ class User {
     }
 
     // Método para crear un nuevo usuario
-    public function create($name, $lastname, $ci, $rol, $password) {
+    public function create($name, $lastname, $ci, $rol, $password, $cargo) {
         // Hashear la contraseña
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-        $sql = "INSERT INTO user (name, lastname, ci, rol, password) VALUES (:name, :lastname, :ci, :rol, :password)";
+        $sql = "INSERT INTO user (name, lastname, ci, rol, password, cargo) VALUES (:name, :lastname, :ci, :rol, :password, :cargo)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
             'name' => $name,
             'lastname' => $lastname,
             'ci' => $ci,
             'rol' => $rol,
-            'password' => $hashedPassword 
+            'password' => $hashedPassword,
+            'cargo' => $cargo
         ]);
         return $this->pdo->lastInsertId();
     }
@@ -41,10 +42,17 @@ class User {
     }
 
     // Método para actualizar un usuario
-    public function update($id, $name, $lastname, $ci, $rol) {
-        $sql = "UPDATE user SET name = :name, lastname = :lastname, ci = :ci, rol = :rol WHERE id = :id";
+    public function update($id, $name, $lastname, $ci, $rol, $cargo) {
+        $sql = "UPDATE user SET name = :name, lastname = :lastname, ci = :ci, rol = :rol, cargo = :cargo WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute(['id' => $id, 'name' => $name, 'lastname' => $lastname, 'ci' => $ci, 'rol' => $rol]);
+        return $stmt->execute([
+            'id' => $id,
+            'name' => $name,
+            'lastname' => $lastname,
+            'ci' => $ci,
+            'rol' => $rol,
+            'cargo' => $cargo
+        ]);
     }
 
     // Método para eliminar un usuario

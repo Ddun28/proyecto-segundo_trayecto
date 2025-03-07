@@ -150,13 +150,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!Array.isArray(data)) {
                     throw new Error('La respuesta no es un array válido');
                 }
+                const usersTableBody = document.getElementById('usersTableBody');
                 usersTableBody.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
+    
                 data.forEach(user => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${user.name}</td>
                         <td>${user.lastname}</td>
                         <td>${user.ci}</td>
+                        <td>${user.cargo}</td> <!-- Nuevo campo cargo -->
                         <td>
                             <button class="editBtn" data-id="${user.id}">Editar</button>
                             <button class="deleteBtn" data-id="${user.id}">Eliminar</button>
@@ -164,12 +167,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
                     usersTableBody.appendChild(row);
                 });
-
+    
                 updateUserCount(data.length);
-
+    
                 // Estilizar los botones
                 styleButtons();
-
+    
                 // Agregar eventos a los botones de eliminar
                 document.querySelectorAll('.deleteBtn').forEach(button => {
                     button.addEventListener('click', function () {
@@ -177,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         deleteUser(userId);
                     });
                 });
-
+    
                 // Agregar eventos a los botones de editar
                 document.querySelectorAll('.editBtn').forEach(button => {
                     button.addEventListener('click', function () {
@@ -194,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             })
                             .catch(error => {
                                 console.error('Error al obtener los datos del usuario:', error);
-                                alert('Hubo un error al obtener los datos del usuario. Verifica la consola para más detalles.');
                             });
                     });
                 });
@@ -277,16 +279,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
    // Función para abrir el modal
-function openEditModal(user) {
+   function openEditModal(user) {
     const modal = document.getElementById('editUserModal');
     const editName = document.getElementById('editName');
     const editLastname = document.getElementById('editLastname');
     const editCi = document.getElementById('editCi');
+    const editRol = document.getElementById('editRol');
+    const editCargo = document.getElementById('editCargo');
 
     // Llenar los campos del modal con los datos del usuario
     editName.value = user.name;
     editLastname.value = user.lastname;
     editCi.value = user.ci;
+    editRol.value = user.rol;
+    editCargo.value = user.cargo;
 
     // Mostrar el modal
     modal.classList.add('open');
@@ -317,13 +323,15 @@ function saveUserChanges(userId) {
     const editLastname = document.getElementById('editLastname').value;
     const editCi = document.getElementById('editCi').value;
     const editRol = document.getElementById('editRol').value;
+    const editCargo = document.getElementById('editCargo').value;
 
     const updatedUser = {
         id: userId,
         name: editName,
         lastname: editLastname,
         ci: editCi,
-        rol: editRol
+        rol: editRol,
+        cargo: editCargo
     };
 
     fetch(`../../controllers/UserController.php?action=updateUser`, {
@@ -454,13 +462,25 @@ function openFilterModal() {
 }
 
 function filterAsistencias(period) {
+    const asistenciaList = document.getElementById('asistenciaList');
+    const totalAsistenciasElement = document.getElementById('totalAsistencias');
+
+    // Mostrar un mensaje de carga
+    asistenciaList.innerHTML = '<li>Cargando asistencias...</li>';
+    totalAsistenciasElement.textContent = '0';
+
+    // Realizar la solicitud al servidor
     fetch(`../../controllers/AsistenciaController.php?action=getAsistencias&filter=${period}`)
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const asistenciaList = document.getElementById('asistenciaList');
-                asistenciaList.innerHTML = ''; // Limpiar la lista antes de agregar nuevos elementos
+                // Limpiar la lista antes de agregar nuevos elementos
+                asistenciaList.innerHTML = '';
 
+                // Actualizar el contador de asistencias
+                totalAsistenciasElement.textContent = data.asistencias.length;
+
+                // Agregar las asistencias filtradas a la lista
                 data.asistencias.forEach(asistencia => {
                     const li = document.createElement('li');
                     li.className = asistencia.hora_salida ? 'completed' : 'not-completed';
@@ -500,10 +520,12 @@ function filterAsistencias(period) {
                 });
             } else {
                 console.error('Error al obtener asistencias:', data.error);
+                asistenciaList.innerHTML = '<li>No se encontraron asistencias.</li>';
             }
         })
         .catch(error => {
             console.error('Error de conexión:', error);
+            asistenciaList.innerHTML = '<li>Error al cargar las asistencias.</li>';
         });
 }
 
@@ -520,17 +542,6 @@ const searchButton = document.querySelector('#content nav form .form-input butto
 const searchButtonIcon = document.querySelector('#content nav form .form-input button .bx');
 const searchForm = document.querySelector('#content nav form');
 
-searchButton.addEventListener('click', function (e) {
-    if (window.innerWidth < 576) {
-        e.preventDefault();
-        searchForm.classList.toggle('show');
-        if (searchForm.classList.contains('show')) {
-            searchButtonIcon.classList.replace('bx-search', 'bx-x');
-        } else {
-            searchButtonIcon.classList.replace('bx-x', 'bx-search');
-        }
-    }
-});
 
 // Ajustes para pantallas pequeñas
 if (window.innerWidth < 768) {
@@ -587,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-document.getElementById('generatePdf').addEventListener('click', function() {
+document.getElementById('generatePdf').addEventListener('click', function () {
     const jsPDF = window.jspdf.jsPDF;
     const doc = new jsPDF();
 
@@ -607,7 +618,24 @@ document.getElementById('generatePdf').addEventListener('click', function() {
 
     // Obtener la lista de asistencias
     const asistenciaList = document.getElementById('asistenciaList');
+    if (!asistenciaList) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se encontró la lista de asistencias.'
+        });
+        return;
+    }
+
     const asistencias = asistenciaList.getElementsByTagName('li');
+    if (asistencias.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Advertencia',
+            text: 'No hay asistencias para generar el PDF.'
+        });
+        return;
+    }
 
     // Preparar los datos para la tabla
     const data = [];
