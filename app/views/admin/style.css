@@ -14,6 +14,39 @@ li {
 	list-style: none;
 }
 
+/* Estilos base del botón */
+.pdf-button {
+    background-color: #007bff; /* Color de fondo azul */
+    color: white; /* Texto en blanco */
+    border: none; /* Sin borde */
+    padding: 12px 24px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+    font-family: 'Arial', sans-serif; /* Fuente */
+    border-radius: 8px; /* Bordes redondeados */
+    cursor: pointer; /* Cursor tipo puntero */
+    display: inline-flex; /* Para alinear ícono y texto */
+    align-items: center; /* Centrar verticalmente */
+    gap: 8px; /* Espacio entre ícono y texto */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
+}
+
+/* Estilos cuando el botón está en hover (al pasar el mouse) */
+.pdf-button:hover {
+    background-color: #0056b3; /* Color de fondo más oscuro */
+    transform: translateY(-2px); /* Efecto de elevación */
+}
+
+/* Estilos cuando el botón está activo (al hacer clic) */
+.pdf-button:active {
+    background-color: #004080; /* Color de fondo aún más oscuro */
+    transform: translateY(0); /* Restablecer elevación */
+}
+
+/* Estilos para el ícono */
+.pdf-button i {
+    font-size: 20px; /* Tamaño del ícono */
+}
+
 /* Estilos base para el modal */
 .modal {
 	font-family: var(--lato);

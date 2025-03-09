@@ -38,14 +38,6 @@ class Asistencia {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getAsistencias() {
-        $sql = "SELECT a.id, e.name, e.lastname, a.cedula, a.hora_llegada, a.hora_salida 
-                FROM asistencia a 
-                JOIN user e ON a.cedula = e.ci 
-                ORDER BY a.hora_llegada DESC";
-        $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
     // Método para obtener asistencia por ID
     public function getById($id) {
@@ -101,5 +93,33 @@ class Asistencia {
         ]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC); // Devuelve todas las asistencias del mes junto con los datos del usuario
     }
+
+    public function getAsistencias($filter = null) {
+        $sql = "SELECT a.id, e.name, e.lastname, a.cedula, a.hora_llegada, a.hora_salida 
+                FROM asistencia a 
+                JOIN user e ON a.cedula = e.ci";
+    
+        if ($filter) {
+            switch ($filter) {
+                case 'day':
+                    $sql .= " WHERE DATE(a.hora_llegada) = CURDATE()";
+                    break;
+                case 'week':
+                    $sql .= " WHERE YEARWEEK(a.hora_llegada, 1) = YEARWEEK(CURDATE(), 1)";
+                    break;
+                case 'month':
+                    $sql .= " WHERE MONTH(a.hora_llegada) = MONTH(CURDATE()) AND YEAR(a.hora_llegada) = YEAR(CURDATE())";
+                    break;
+            }
+        } else {
+            // Por defecto, mostrar las asistencias del día actual
+            $sql .= " WHERE DATE(a.hora_llegada) = CURDATE()";
+        }
+    
+        $sql .= " ORDER BY a.hora_llegada DESC";
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 
 }

@@ -42,9 +42,14 @@ class AsistenciaController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function deleteAsistencia($id) {
+        return $this->asistenciaModel->delete($id); 
+    }
+
     public function handleRequest() {
         header('Content-Type: application/json');
         $action = $_GET['action'] ?? '';
+        $filter = $_GET['filter'] ?? null; // Obtener el filtro
     
         try {
             switch ($action) {
@@ -69,7 +74,7 @@ class AsistenciaController {
                     break;
     
                 case 'getAsistencias':
-                    $asistencias = $this->asistenciaModel->getAsistencias();
+                    $asistencias = $this->asistenciaModel->getAsistencias($filter); // Pasar el filtro al modelo
                     echo json_encode(['success' => true, 'asistencias' => $asistencias]);
                     break;
     

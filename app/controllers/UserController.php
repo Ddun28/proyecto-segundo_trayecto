@@ -90,15 +90,21 @@ class UserController {
                     $success = $this->updateUser($data['id'], $data['name'], $data['lastname'], $data['ci'], $data['rol'], $data['cargo']);
                     echo json_encode(['success' => $success]);
                     break;
-    
-                case 'deleteUser':
-                    $id = $_GET['id'] ?? '';
-                    if (empty($id)) {
-                        throw new Exception('ID de usuario no proporcionado');
-                    }
-                    $success = $this->deleteUser($id);
-                    echo json_encode(['success' => $success]);
-                    break;
+
+                    case 'deleteUser':
+                        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+                            // Leer el cuerpo de la solicitud
+                            $data = json_decode(file_get_contents("php://input"), true);
+                            $id = $data['id'] ?? '';
+                            if (empty($id)) {
+                                throw new Exception('ID de usuario no proporcionado');
+                            }
+                            $success = $this->deleteUser ($id);
+                            echo json_encode(['success' => $success]);
+                        } else {
+                            throw new Exception('Método no permitido');
+                        }
+                        break;
     
                 default:
                     throw new Exception('Acción no válida');

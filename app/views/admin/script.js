@@ -34,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const usersTableBody = document.getElementById('usersTableBody');
     const searchInput = document.getElementById('searchInput');
-    const searchIcon = document.getElementById('searchIcon');
-
+    const searchIcon = document.getElementById('searchIcon');    
 
     function fetchAndUpdateAsistencias() {
         fetch('../../controllers/AsistenciaController.php?action=getAsistenciasHoy')
@@ -61,10 +60,28 @@ document.addEventListener('DOMContentLoaded', function () {
                             <small>Salida: ${asistencia.hora_salida || 'Pendiente'}</small>
                         `;
     
-                        // Crear el botón de eliminar
                         const eliminarButton = document.createElement('button');
                         eliminarButton.textContent = 'Eliminar';
-                        eliminarButton.className = 'deleteBtn';
+    
+                        // Aplicar estilos manuales
+                        eliminarButton.style.backgroundColor = '#dc3545';
+                        eliminarButton.style.color = '#fff';
+                        eliminarButton.style.border = 'none';
+                        eliminarButton.style.borderRadius = '4px';
+                        eliminarButton.style.padding = '8px 16px';
+                        eliminarButton.style.fontSize = '14px';
+                        eliminarButton.style.cursor = 'pointer';
+                        eliminarButton.style.transition = 'background-color 0.3s ease';
+    
+                        // Efecto hover
+                        eliminarButton.addEventListener('mouseover', () => {
+                            eliminarButton.style.backgroundColor = '#c82333';
+                        });
+    
+                        // Efecto al quitar el mouse
+                        eliminarButton.addEventListener('mouseout', () => {
+                            eliminarButton.style.backgroundColor = '#dc3545';
+                        });
                         eliminarButton.addEventListener('click', function () {
                             Swal.fire({
                                 title: '¿Estás seguro de que deseas eliminar esta asistencia?',
@@ -99,10 +116,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Llamar a la función para cargar y actualizar las asistencias
     fetchAndUpdateAsistencias();
 
-    // Función para eliminar una asistencia
     function eliminarAsistencia(id) {
-        fetch(`../../controllers/AsistenciaController.php?action=deleteAsistencia&id=${id}`, {
-            method: 'DELETE'
+        fetch(`../../controllers/AsistenciaController.php?action=deleteAsistencia`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id }) // Enviar el ID en el cuerpo
         })
         .then(response => {
             if (!response.ok) {
@@ -252,11 +272,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Función para eliminar un usuario
-    function deleteUser(userId) {
-        if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-            fetch(`../../../controllers/UserController.php?action=deleteUser&id=${userId}`, {
-                method: 'DELETE'
-            })
+    function deleteUser (userId) {
+        Swal.fire({
+            title: '¿Estás seguro de que deseas eliminar este usuario?',
+            text: 'Esta acción no se puede deshacer.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`../../controllers/UserController.php?action=deleteUser `, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: userId }) // Enviar el ID en el cuerpo
+                })
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Error en la solicitud: ' + response.statusText);
@@ -265,17 +299,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(data => {
                     if (data.success) {
-                        alert('Usuario eliminado correctamente');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Usuario eliminado correctamente',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                         loadUsers(); // Recargar la tabla después de eliminar
                     } else {
-                        alert('Error al eliminar el usuario');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error al eliminar el usuario',
+                            text: data.error || 'Hubo un error al eliminar el usuario.'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error al eliminar el usuario:', error);
-                    alert('Hubo un error al eliminar el usuario. Verifica la consola para más detalles.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un error al eliminar el usuario. Verifica la consola para más detalles.'
+                    });
                 });
-        }
+            }
+        });
     }
 
    // Función para abrir el modal
@@ -358,7 +406,8 @@ function saveUserChanges(userId) {
                 timer: 3000 // Duración del toast (3 segundos)
             });
             loadUsers(); // Recargar la tabla después de actualizar
-            document.getElementById('editUserModal').style.display = 'none'; // Cerrar el modal
+            document.getElementById('editUserModal').style.display = 'none';
+            location.reload(); // Cerrar el modal
         } else {
             Swal.fire({
                 icon: 'error',
@@ -408,7 +457,6 @@ function saveUserChanges(userId) {
                 })
                 .catch(error => {
                     console.error('Error al buscar usuarios:', error);
-                    alert('Hubo un error al buscar usuarios. Verifica la consola para más detalles.');
                 });
         } else {
             loadUsers();
@@ -419,40 +467,37 @@ function saveUserChanges(userId) {
     loadUsers();
 });
 
-// Código para el sidebar, búsqueda y modo oscuro
-const allSideMenu = document.querySelectorAll('#sidebar .side-menu.top li a');
-
-allSideMenu.forEach(item => {
-    const li = item.parentElement;
-
-    item.addEventListener('click', function () {
-        allSideMenu.forEach(i => {
-            i.parentElement.classList.remove('active');
-        });
-        li.classList.add('active');
-    });
-});
 
 function openFilterModal() {
     Swal.fire({
         title: 'Filtrar Asistencias',
         text: 'Selecciona un período:',
-        showCancelButton: true,
+        showCancelButton: false, // Ocultar el botón de cancelar
+        showConfirmButton: false, // Ocultar el botón "OK"
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         html: `
             <div>
+                <button id="filterDay" class="swal2-confirm swal2-styled">Por Día</button>
                 <button id="filterWeek" class="swal2-confirm swal2-styled">Por Semana</button>
                 <button id="filterMonth" class="swal2-confirm swal2-styled">Por Mes</button>
             </div>
         `,
         focusConfirm: false,
         didOpen: () => {
+            // Configurar el evento para el botón "Por Día"
+            document.getElementById('filterDay').onclick = () => {
+                Swal.close(); // Cerrar el modal
+                filterAsistencias('day'); // Aplicar el filtro de día
+            };
 
+            // Configurar el evento para el botón "Por Semana"
             document.getElementById('filterWeek').onclick = () => {
                 Swal.close(); // Cerrar el modal
                 filterAsistencias('week'); // Aplicar el filtro de semana
             };
+
+            // Configurar el evento para el botón "Por Mes"
             document.getElementById('filterMonth').onclick = () => {
                 Swal.close(); // Cerrar el modal
                 filterAsistencias('month'); // Aplicar el filtro de mes
@@ -465,7 +510,7 @@ function filterAsistencias(period) {
     const asistenciaList = document.getElementById('asistenciaList');
     const totalAsistenciasElement = document.getElementById('totalAsistencias');
 
-    // Mostrar un mensaje de carga
+    // Limpiar la lista antes de cargar nuevas asistencias
     asistenciaList.innerHTML = '<li>Cargando asistencias...</li>';
     totalAsistenciasElement.textContent = '0';
 
@@ -492,10 +537,30 @@ function filterAsistencias(period) {
                         <small>Salida: ${asistencia.hora_salida || 'Pendiente'}</small>
                     `;
 
-                    // Crear el botón de eliminar
                     const eliminarButton = document.createElement('button');
-                    eliminarButton.className = 'deleteBtn';
                     eliminarButton.textContent = 'Eliminar';
+
+                    // Aplicar estilos manuales
+                    eliminarButton.style.backgroundColor = '#dc3545';
+                    eliminarButton.style.color = '#fff';
+                    eliminarButton.style.border = 'none';
+                    eliminarButton.style.borderRadius = '4px';
+                    eliminarButton.style.padding = '8px 16px';
+                    eliminarButton.style.fontSize = '14px';
+                    eliminarButton.style.cursor = 'pointer';
+                    eliminarButton.style.transition = 'background-color 0.3s ease';
+
+                    // Efecto hover
+                    eliminarButton.addEventListener('mouseover', () => {
+                        eliminarButton.style.backgroundColor = '#c82333';
+                    });
+
+                    // Efecto al quitar el mouse
+                    eliminarButton.addEventListener('mouseout', () => {
+                        eliminarButton.style.backgroundColor = '#dc3545';
+                    });
+
+                    // Agregar evento de clic
                     eliminarButton.addEventListener('click', function () {
                         Swal.fire({
                             title: '¿Estás seguro de que deseas eliminar esta asistencia?',
@@ -547,13 +612,11 @@ const searchForm = document.querySelector('#content nav form');
 if (window.innerWidth < 768) {
     sidebar.classList.add('hide');
 } else if (window.innerWidth > 576) {
-    searchButtonIcon.classList.replace('bx-x', 'bx-search');
     searchForm.classList.remove('show');
 }
 
 window.addEventListener('resize', function () {
     if (this.innerWidth > 576) {
-        searchButtonIcon.classList.replace('bx-x', 'bx-search');
         searchForm.classList.remove('show');
     }
 });
@@ -599,7 +662,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.getElementById('generatePdf').addEventListener('click', function () {
-    const jsPDF = window.jspdf.jsPDF;
+    // Verificar si jsPDF está disponible
+    if (!window.jspdf) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'La librería jsPDF no está cargada.'
+        });
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
     // Título del PDF
@@ -642,7 +715,11 @@ document.getElementById('generatePdf').addEventListener('click', function () {
     for (let i = 0; i < asistencias.length; i++) {
         const asistencia = asistencias[i].querySelector('p').innerText;
         const [nombre, llegada, salida] = asistencia.split('\n'); // Dividir el texto en partes
-        data.push([nombre.trim(), llegada.trim(), salida.trim()]);
+        data.push([
+            nombre.trim().replace('<strong>', '').replace('</strong>', ''), // Limpiar etiquetas HTML
+            llegada.trim().replace('<small>', '').replace('</small>', ''), // Limpiar etiquetas HTML
+            salida.trim().replace('<small>', '').replace('</small>', '') // Limpiar etiquetas HTML
+        ]);
     }
 
     // Crear la tabla
@@ -663,4 +740,13 @@ document.getElementById('generatePdf').addEventListener('click', function () {
 
     // Guardar el PDF
     doc.save('reporte_asistencias.pdf');
+
+    // Notificar al usuario
+    Swal.fire({
+        icon: 'success',
+        title: 'PDF Generado',
+        text: 'El reporte de asistencias se ha generado correctamente.',
+        showConfirmButton: false,
+        timer: 1500
+    });
 });

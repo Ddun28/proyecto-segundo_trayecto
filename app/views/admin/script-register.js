@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const lastname = document.getElementById('lastname').value;
         const ci = document.getElementById('ci').value;
         const rol = document.getElementById('rol').value;
+        const cargo = document.getElementById('cargo').value;
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
 
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
             lastname: lastname,
             ci: ci,
             rol: rol,
+            cargo: cargo,
             password: password
         };
 
